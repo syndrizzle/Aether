@@ -1,0 +1,3 @@
+[submodule "example-voting-app"]
+	path = example-voting-app
+	url = https://github.com/dockersamples/example-voting-app

@@ -39,6 +39,7 @@ module "eks" {
       }
     }
   }
+  enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   eks_managed_node_groups = {
     worker_nodes = {
       min_size     = 1
@@ -48,4 +49,14 @@ module "eks" {
       instance_types = ["t3.medium"]
     }
   }
+}
+resource "aws_eks_addon" "cloudwatch_monitoring" {
+  cluster_name = module.eks.cluster_name
+  addon_name   = "amazon-cloudwatch-observability"
+  depends_on   = [module.eks]
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cloudwatch_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  role       = module.eks.eks_managed_node_groups["worker_nodes"].iam_role_name
 }

@@ -1,0 +1,5 @@
+misconfigurations:
+  - id: AWS-0104
+    paths:
+      - "terraform-aws-modules/eks/aws/node_groups.tf"
+    statement: "The official AWS EKS Terraform module hardcodes a default 0.0.0.0/0 egress rule. We override this securely via node_security_group_additional_rules in our eks.tf."

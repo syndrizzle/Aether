@@ -40,7 +40,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: example-${{ matrix.app }}-app
-          IMAGE_TAG: latest
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./example-voting-app/${{ matrix.app }}
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -48,7 +48,7 @@ jobs:
       - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: "${{ steps.login-ecr.outputs.registry }}/example-${{ matrix.app }}-app:latest"
+          image-ref: "${{ steps.login-ecr.outputs.registry }}/example-${{ matrix.app }}-app:${{ github.sha }}"
           format: "table"
           exit-code: "0"
           ignore-unfixed: true
@@ -69,7 +69,7 @@ jobs:
           cd k8s
 
           # 3. Safely swap the target image with the new ECR URL
-          kustomize edit set image example-${{ matrix.app }}-app=$ECR_REGISTRY/example-${{ matrix.app }}-app:latest
+          kustomize edit set image example-${{ matrix.app }}-app=$ECR_REGISTRY/example-${{ matrix.app }}-app:${{ github.sha }}
 
           # 4. Apply using Kustomize (-k) instead of file (-f)
           kubectl apply -k .

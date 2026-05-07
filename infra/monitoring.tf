@@ -1,8 +1,33 @@
-# Create the SNS Topic
+module "kms" {
+  source                  = "terraform-aws-modules/kms/aws"
+  version                 = "~> 4.0"
+  description             = "KMS Key for EKS CloudWatch to SNS alerts"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+  aliases                 = ["eks-alerts-key"]
+  key_statements = [
+    {
+      sid    = "AllowCloudWatchForCMK"
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey*"
+      ]
+      resources = ["*"]
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["cloudwatch.amazonaws.com"]
+        }
+      ]
+    }
+  ]
+}
 resource "aws_sns_topic" "eks_alerts" {
   name              = "eks-alerts-topic"
-  kms_master_key_id = "alias/aws/sns"
+  kms_master_key_id = module.kms.key_id
 }
+
 resource "aws_sns_topic_subscription" "eks_alerts_email" {
   topic_arn = aws_sns_topic.eks_alerts.arn
   protocol  = "email"

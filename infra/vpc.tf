@@ -24,42 +24,4 @@ module "vpc_endpoints" {
 
   vpc_id             = module.vpc.vpc_id
   security_group_ids = [module.eks.node_security_group_id]
-
-  endpoints = {
-    ecr_api = {
-      service             = "ecr.api"
-      private_dns_enabled = true
-      subnet_ids          = module.vpc.private_subnets
-    }
-    ecr_dkr = {
-      service             = "ecr.dkr"
-      private_dns_enabled = true
-      subnet_ids          = module.vpc.private_subnets
-    }
-    s3 = {
-      service         = "s3"
-      service_type    = "Gateway"
-      route_table_ids = module.vpc.private_route_table_ids
-    }
-    logs = {
-      service             = "logs"
-      private_dns_enabled = true
-      subnet_ids          = module.vpc.private_subnets
-    }
-    sts = {
-      service             = "sts"
-      private_dns_enabled = true
-      subnet_ids          = module.vpc.private_subnets
-    }
-    monitoring = {
-      service             = "monitoring"
-      private_dns_enabled = true
-      subnet_ids          = module.vpc.private_subnets
-    }
-    ec2 = {
-      service             = "ec2"
-      private_dns_enabled = true
-      subnet_ids          = module.vpc.private_subnets
-    }
-  }
 }

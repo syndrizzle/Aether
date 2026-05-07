@@ -9,3 +9,8 @@ variable "github_repo_url" {
   type        = string
   default     = "https://github.com/syndrizzle/devops-task-sem6.git"
 }
+
+variable "alert_email_address" {
+  description = "The email address that will receive EKS CloudWatch alerts"
+  type        = string
+}

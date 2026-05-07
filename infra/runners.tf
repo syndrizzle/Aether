@@ -12,6 +12,8 @@ module "github_runners" {
   environment_compute_type = "BUILD_GENERAL1_SMALL"
   build_timeout            = 10
 
+  privileged_mode = true
+
   # Authentication
   github_personal_access_token = var.github_pat
 }

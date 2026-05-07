@@ -1,6 +1,7 @@
 # Create the SNS Topic
 resource "aws_sns_topic" "eks_alerts" {
-  name = "eks-alerts-topic"
+  name              = "eks-alerts-topic"
+  kms_master_key_id = "alias/aws/sns"
 }
 resource "aws_sns_topic_subscription" "eks_alerts_email" {
   topic_arn = aws_sns_topic.eks_alerts.arn

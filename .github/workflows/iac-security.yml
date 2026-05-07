@@ -36,6 +36,7 @@ jobs:
         with:
           scan-type: "config"
           scan-ref: "./infra"
+          trivyignores: ".trivyignore.yaml"
           format: "table"
           hide-progress: true
           exit-code: "0"

@@ -9,21 +9,24 @@ module "eks" {
   source                  = "terraform-aws-modules/eks/aws"
   version                 = "~> 21.0"
   name                    = "voting-app-cluster"
-  kubernetes_version      = "1.33"
+  kubernetes_version      = "1.34"
   vpc_id                  = module.vpc.vpc_id
   subnet_ids              = module.vpc.private_subnets
   endpoint_public_access  = false
   endpoint_private_access = true
   addons = {
     coredns = {
-      most_recent = true
+      most_recent                 = true
+      resolve_conflicts_on_update = "OVERWRITE"
     }
     kube-proxy = {
-      most_recent = true
+      most_recent                 = true
+      resolve_conflicts_on_update = "OVERWRITE"
     }
     vpc-cni = {
-      most_recent    = true
-      before_compute = true
+      most_recent                 = true
+      before_compute              = true
+      resolve_conflicts_on_update = "OVERWRITE"
     }
   }
   access_entries = {

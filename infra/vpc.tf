@@ -51,5 +51,15 @@ module "vpc_endpoints" {
       private_dns_enabled = true
       subnet_ids          = module.vpc.private_subnets
     }
+    monitoring = {
+      service             = "monitoring"
+      private_dns_enabled = true
+      subnet_ids          = module.vpc.private_subnets
+    }
+    ec2 = {
+      service             = "ec2"
+      private_dns_enabled = true
+      subnet_ids          = module.vpc.private_subnets
+    }
   }
 }

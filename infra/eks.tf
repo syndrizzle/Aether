@@ -1,4 +1,9 @@
 data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.${data.aws_region.current.name}.s3"
+}
 
 module "eks" {
   source                  = "terraform-aws-modules/eks/aws"
@@ -43,6 +48,24 @@ module "eks" {
       max_size       = 3
       desired_size   = 2
       instance_types = ["t3.medium"]
+    }
+  }
+  node_security_group_additional_rules = {
+    egress_all_vpc = {
+      description = "Node all egress to VPC only"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "egress"
+      cidr_blocks = ["10.0.0.0/16"]
+    }
+    egress_s3 = {
+      description     = "Node egress to S3 Prefix List (required for ECR image layers)"
+      protocol        = "tcp"
+      from_port       = 443
+      to_port         = 443
+      type            = "egress"
+      prefix_list_ids = [data.aws_prefix_list.s3.id]
     }
   }
 }

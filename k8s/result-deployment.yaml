@@ -15,7 +15,7 @@ spec:
         app: result
     spec:
       containers:
-        - image: syndrizzle/example-result-app:latest
+        - image: example-result-app
           name: result
           ports:
             - containerPort: 80

@@ -1,17 +1,14 @@
 data "aws_caller_identity" "current" {}
 
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "~> 21.0"
-
-  name               = "voting-app-cluster"
-  kubernetes_version = "1.33"
-
+  source                  = "terraform-aws-modules/eks/aws"
+  version                 = "~> 21.0"
+  name                    = "voting-app-cluster"
+  kubernetes_version      = "1.33"
   vpc_id                  = module.vpc.vpc_id
   subnet_ids              = module.vpc.private_subnets
   endpoint_public_access  = false
   endpoint_private_access = true
-
   addons = {
     coredns = {
       most_recent = true
@@ -24,7 +21,6 @@ module "eks" {
       before_compute = true
     }
   }
-
   access_entries = {
     syndrizzle_admin = {
       kubernetes_groups = []
@@ -43,10 +39,9 @@ module "eks" {
   enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   eks_managed_node_groups = {
     worker_nodes = {
-      min_size     = 1
-      max_size     = 3
-      desired_size = 2
-
+      min_size       = 1
+      max_size       = 3
+      desired_size   = 2
       instance_types = ["t3.medium"]
     }
   }

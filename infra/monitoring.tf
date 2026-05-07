@@ -8,7 +8,6 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
   statistic           = "Average"
   threshold           = "80"
   alarm_description   = "This metric monitors EKS node CPU utilization"
-
   dimensions = {
     ClusterName = module.eks.cluster_name
   }

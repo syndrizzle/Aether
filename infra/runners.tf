@@ -21,3 +21,13 @@ resource "aws_security_group_rule" "codebuild_to_eks_api" {
   source_security_group_id = module.github_runners.aws_security_group_id
   description              = "Allow GitHub Actions CodeBuild runner to access EKS API"
 }
+
+resource "aws_security_group_rule" "codebuild_to_vpc_endpoints" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = module.eks.node_security_group_id
+  source_security_group_id = module.github_runners.aws_security_group_id
+  description              = "Allow CodeBuild runner to authenticate via STS and pull/push ECR images"
+}

@@ -55,6 +55,9 @@ jobs:
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
 
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v3
+
       - name: Deploy to EKS (Kustomize)
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}

@@ -31,8 +31,12 @@ jobs:
         working-directory: ./infra
         run: terraform validate
 
-      - name: Run tfsec (Security & Compliance Scanner)
-        uses: aquasecurity/tfsec-action@v1.0.0
+      - name: Run Trivy Vulnerability Scanner (IaC)
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
-          working_directory: ./infra
-          soft_fail: true
+          scan-type: "config"
+          scan-ref: "./infra"
+          format: "table"
+          hide-progress: true
+          exit-code: "0"
+          severity: "CRITICAL,HIGH"

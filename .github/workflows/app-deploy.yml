@@ -11,7 +11,7 @@ on:
 
 jobs:
   build-scan-push-deploy:
-    runs-on: ubuntu-latest
+    runs-on: codebuild-eks-deploy-runner-${{ github.run_id }}-${{ github.run_attempt }}
     strategy:
       matrix:
         app: [vote, result, worker]

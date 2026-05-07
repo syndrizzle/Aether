@@ -7,9 +7,10 @@ module "eks" {
   name               = "voting-app-cluster"
   kubernetes_version = "1.33"
 
-  vpc_id                 = module.vpc.vpc_id
-  subnet_ids             = module.vpc.private_subnets
-  endpoint_public_access = true
+  vpc_id                  = module.vpc.vpc_id
+  subnet_ids              = module.vpc.private_subnets
+  endpoint_public_access  = false
+  endpoint_private_access = true
 
   addons = {
     coredns = {

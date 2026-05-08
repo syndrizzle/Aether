@@ -26,6 +26,14 @@ resource "helm_release" "cluster_autoscaler" {
     {
       name  = "awsRegion"
       value = "ap-south-1"
+    },
+    {
+      name  = "rbac.serviceAccount.name"
+      value = "cluster-autoscaler"
+    },
+    {
+      name  = "rbac.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+      value = module.cluster_autoscaler_irsa_role.arn
     }
   ]
 }

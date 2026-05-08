@@ -10,11 +10,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-scan-push-deploy:
+  build-and-deploy:
     runs-on: codebuild-eks-deploy-runner-${{ github.run_id }}-${{ github.run_attempt }}
-    strategy:
-      matrix:
-        app: [vote, result, worker]
 
     steps:
       - name: Checkout Code
@@ -36,14 +33,16 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build, tag, and push images to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: example-${{ matrix.app }}-app
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./example-voting-app/${{ matrix.app }}
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          for app in vote result worker; do
+            ECR_REPOSITORY="example-${app}-app"
+            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./example-voting-app/${app}
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          done
 
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@v3
@@ -51,18 +50,21 @@ jobs:
       - name: Deploy to EKS
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           # 1. Update Kubeconfig
           aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name voting-app-cluster
 
-          # 2. Enter the k8s directory where kustomization.yaml lives
+          # 2. Enter the k8s directory
           cd k8s
 
-          # 3. Safely swap the target image with the new ECR URL
-          kustomize edit set image example-${{ matrix.app }}-app=$ECR_REGISTRY/example-${{ matrix.app }}-app:${{ github.sha }}
+          # 3. Safely swap target images for ALL apps
+          kustomize edit set image example-vote-app=$ECR_REGISTRY/example-vote-app:$IMAGE_TAG
+          kustomize edit set image example-result-app=$ECR_REGISTRY/example-result-app:$IMAGE_TAG
+          kustomize edit set image example-worker-app=$ECR_REGISTRY/example-worker-app:$IMAGE_TAG
 
-          # 4. Apply using Kustomize (-k) instead of file (-f)
+          # 4. Apply all manifests at once atomically
           kubectl apply -k .
 
-          # 5. Restart to pull the new image
-          kubectl rollout restart deployment/${{ matrix.app }}
+          # 5. Restart all deployments
+          kubectl rollout restart deployment/vote deployment/result deployment/worker

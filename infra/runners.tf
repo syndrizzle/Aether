@@ -1,6 +1,6 @@
 module "github_runners" {
   source                       = "cloudandthings/github-runners/aws"
-  version                      = "~> 3.0"
+  version                      = "~> 3.9.0"
   name                         = "eks-deploy-runner"
   source_location              = var.github_repo_url
   description                  = "Serverless GitHub Actions Runner for EKS deployments"

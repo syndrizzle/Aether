@@ -7,7 +7,7 @@ data "aws_prefix_list" "s3" {
 
 module "eks" {
   source                       = "terraform-aws-modules/eks/aws"
-  version                      = "~> 21.0"
+  version                      = "~> 21.20.0"
   name                         = "voting-app-cluster"
   kubernetes_version           = "1.34"
   vpc_id                       = module.vpc.vpc_id
@@ -49,7 +49,7 @@ module "eks" {
   eks_managed_node_groups = {
     worker_nodes = {
       min_size       = 1
-      max_size       = 3
+      max_size       = 5
       desired_size   = 2
       instance_types = ["t3.medium"]
     }
@@ -79,7 +79,44 @@ resource "aws_eks_addon" "cloudwatch_monitoring" {
   depends_on   = [module.eks]
 }
 
+resource "aws_iam_policy" "cluster_autoscaler" {
+  name        = "eks-cluster-autoscaler"
+  description = "Permissions for Cluster Autoscaler to modify ASGs"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "autoscaling:DescribeAutoScalingGroups",
+          "autoscaling:DescribeAutoScalingInstances",
+          "autoscaling:DescribeLaunchConfigurations",
+          "autoscaling:DescribeScalingActivities",
+          "autoscaling:DescribeTags",
+          "ec2:DescribeInstanceTypes",
+          "ec2:DescribeLaunchTemplateVersions"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "autoscaling:SetDesiredCapacity",
+          "autoscaling:TerminateInstanceInAutoScalingGroup",
+          "autoscaling:UpdateAutoScalingGroup"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "eks_cloudwatch_policy" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  role       = module.eks.eks_managed_node_groups["worker_nodes"].iam_role_name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_autoscaler_policy" {
+  policy_arn = aws_iam_policy.cluster_autoscaler.arn
   role       = module.eks.eks_managed_node_groups["worker_nodes"].iam_role_name
 }

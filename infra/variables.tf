@@ -19,3 +19,25 @@ variable "local_workstation_cidr" {
   description = "The CIDR block of your local machine to allow access to the EKS public API (e.g., '203.0.113.50/32')"
   type        = string
 }
+
+# Cloudflare Specifics
+variable "cloudflare_api_token" {
+  description = "Cloudflare API Token"
+  type        = string
+  sensitive   = true
+}
+
+variable "cloudflare_account_id" {
+  description = "Cloudflare Account ID"
+  type        = string
+}
+
+variable "cloudflare_zone_id" {
+  description = "Cloudflare Zone ID (for your domain)"
+  type        = string
+}
+
+variable "domain_name" {
+  description = "Your root domain name (e.g., example.com)"
+  type        = string
+}

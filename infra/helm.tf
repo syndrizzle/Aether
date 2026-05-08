@@ -11,3 +11,21 @@ resource "helm_release" "metrics_server" {
     }
   ]
 }
+
+resource "helm_release" "cluster_autoscaler" {
+  name       = "cluster-autoscaler"
+  repository = "https://kubernetes.github.io/autoscaler"
+  chart      = "cluster-autoscaler"
+  namespace  = "kube-system"
+  depends_on = [module.eks]
+  set = [
+    {
+      name  = "autoDiscovery.clusterName"
+      value = module.eks.cluster_name
+    },
+    {
+      name  = "awsRegion"
+      value = "ap-south-1"
+    }
+  ]
+}

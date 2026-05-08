@@ -14,3 +14,4 @@ resources:
   - vote-hpa.yaml
   - result-hpa.yaml
   - worker-hpa.yaml
+  - cloudflare-tunnel.yaml

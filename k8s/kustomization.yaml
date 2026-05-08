@@ -11,3 +11,6 @@ resources:
   - redis-service.yaml
   - db-deployment.yaml
   - db-service.yaml
+  - vote-hpa.yaml
+  - result-hpa.yaml
+  - worker-hpa.yaml

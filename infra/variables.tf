@@ -14,3 +14,8 @@ variable "alert_email_address" {
   description = "The email address that will receive EKS CloudWatch alerts"
   type        = string
 }
+
+variable "local_workstation_cidr" {
+  description = "The CIDR block of your local machine to allow access to the EKS public API (e.g., '203.0.113.50/32')"
+  type        = string
+}

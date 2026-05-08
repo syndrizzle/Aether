@@ -6,14 +6,15 @@ data "aws_prefix_list" "s3" {
 }
 
 module "eks" {
-  source                  = "terraform-aws-modules/eks/aws"
-  version                 = "~> 21.0"
-  name                    = "voting-app-cluster"
-  kubernetes_version      = "1.34"
-  vpc_id                  = module.vpc.vpc_id
-  subnet_ids              = module.vpc.private_subnets
-  endpoint_public_access  = false
-  endpoint_private_access = true
+  source                       = "terraform-aws-modules/eks/aws"
+  version                      = "~> 21.0"
+  name                         = "voting-app-cluster"
+  kubernetes_version           = "1.34"
+  vpc_id                       = module.vpc.vpc_id
+  subnet_ids                   = module.vpc.private_subnets
+  endpoint_public_access       = true
+  endpoint_private_access      = true
+  endpoint_public_access_cidrs = [var.local_workstation_cidr]
   addons = {
     coredns = {
       most_recent                 = true

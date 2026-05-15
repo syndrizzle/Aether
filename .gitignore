@@ -9,3 +9,6 @@
 crash.log
 crash.*.log
 *.tfvars
+
+#
+env.yaml

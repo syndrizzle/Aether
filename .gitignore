@@ -10,8 +10,11 @@ crash.log
 crash.*.log
 *.tfvars
 
-#
+# env file
 env.yaml
 
 # Generated provider configuration (contains sensitive tokens)
 **/providers.tf
+
+# Terragrunt cache
+**/.terragrunt-cache/

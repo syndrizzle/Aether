@@ -1,6 +1,7 @@
 locals {
-  env_file_path = "${get_terragrunt_dir()}/env.yaml"
-  env_vars = fileexists(local.env_file_path) ? yamldecode(file(local.env_file_path)) : run_cmd("--terragrunt-quiet", "sh", "-c", "echo 'ERROR: env.yaml not found. Please copy env.example.yaml to env.yaml and configure it before running Terragrunt.' >&2 && exit 1")
+  root_dir      = dirname(find_in_parent_folders("root.hcl"))
+  env_file_path = "${local.root_dir}/env.yaml"
+  env_vars      = yamldecode(file(local.env_file_path))
 }
 
 generate "providers" {
@@ -20,6 +21,14 @@ terraform {
     random = {
       source  = "hashicorp/random"
       version = "~> 3.8.0"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 3.1.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 3.1.0"
     }
   }
 }

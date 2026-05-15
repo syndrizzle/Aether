@@ -3,7 +3,6 @@ resource "helm_release" "metrics_server" {
   repository = "https://kubernetes-sigs.github.io/metrics-server/"
   chart      = "metrics-server"
   namespace  = "kube-system"
-  depends_on = [module.eks]
   set = [
     {
       name  = "args[0]"
@@ -17,15 +16,14 @@ resource "helm_release" "cluster_autoscaler" {
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
   namespace  = "kube-system"
-  depends_on = [module.eks]
   set = [
     {
       name  = "autoDiscovery.clusterName"
-      value = module.eks.cluster_name
+      value = var.cluster_name
     },
     {
       name  = "awsRegion"
-      value = "ap-south-1"
+      value = var.aws_region
     },
     {
       name  = "rbac.serviceAccount.name"
@@ -33,7 +31,7 @@ resource "helm_release" "cluster_autoscaler" {
     },
     {
       name  = "rbac.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-      value = module.cluster_autoscaler_irsa_role.arn
+      value = var.cluster_autoscaler_role_arn
     }
   ]
 }

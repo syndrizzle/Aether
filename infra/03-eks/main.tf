@@ -31,7 +31,7 @@ module "eks" {
     }
   }
   access_entries = {
-    syndrizzle_admin = {
+    cluster_admin = {
       kubernetes_groups = []
       principal_arn     = data.aws_caller_identity.current.arn
 

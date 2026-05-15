@@ -12,3 +12,6 @@ crash.*.log
 
 #
 env.yaml
+
+# Generated provider configuration (contains sensitive tokens)
+**/providers.tf

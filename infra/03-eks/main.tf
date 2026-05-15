@@ -24,8 +24,8 @@ module "eks" {
   version                      = "~> 21.20.0"
   name                         = "voting-app-cluster"
   kubernetes_version           = "1.34"
-  vpc_id                       = module.vpc.vpc_id
-  subnet_ids                   = module.vpc.private_subnets
+  vpc_id                       = var.vpc_id
+  subnet_ids                   = var.private_subnets
   endpoint_public_access       = true
   endpoint_private_access      = true
   endpoint_public_access_cidrs = [var.local_workstation_cidr]

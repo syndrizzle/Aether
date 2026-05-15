@@ -5,20 +5,6 @@ data "aws_prefix_list" "s3" {
   name = "com.amazonaws.${data.aws_region.current.region}.s3"
 }
 
-module "cluster_autoscaler_irsa_role" {
-  source                           = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version                          = "~> 6.6.0"
-  name                             = "cluster-autoscaler"
-  attach_cluster_autoscaler_policy = true
-  cluster_autoscaler_cluster_names = [module.eks.cluster_name]
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:cluster-autoscaler"]
-    }
-  }
-}
-
 module "eks" {
   source                       = "terraform-aws-modules/eks/aws"
   version                      = "~> 21.20.0"
@@ -91,46 +77,4 @@ resource "aws_eks_addon" "cloudwatch_monitoring" {
   cluster_name = module.eks.cluster_name
   addon_name   = "amazon-cloudwatch-observability"
   depends_on   = [module.eks]
-}
-
-resource "aws_iam_policy" "cluster_autoscaler" {
-  name        = "eks-cluster-autoscaler"
-  description = "Permissions for Cluster Autoscaler to modify ASGs"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "autoscaling:DescribeAutoScalingGroups",
-          "autoscaling:DescribeAutoScalingInstances",
-          "autoscaling:DescribeLaunchConfigurations",
-          "autoscaling:DescribeScalingActivities",
-          "autoscaling:DescribeTags",
-          "ec2:DescribeInstanceTypes",
-          "ec2:DescribeLaunchTemplateVersions"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "autoscaling:SetDesiredCapacity",
-          "autoscaling:TerminateInstanceInAutoScalingGroup",
-          "autoscaling:UpdateAutoScalingGroup"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "eks_cloudwatch_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-  role       = module.eks.eks_managed_node_groups["worker_nodes"].iam_role_name
-}
-
-resource "aws_iam_role_policy_attachment" "eks_autoscaler_policy" {
-  policy_arn = aws_iam_policy.cluster_autoscaler.arn
-  role       = module.eks.eks_managed_node_groups["worker_nodes"].iam_role_name
 }

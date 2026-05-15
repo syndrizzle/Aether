@@ -17,3 +17,11 @@ output "node_security_group_id" {
 output "cluster_security_group_id" {
   value = module.eks.cluster_security_group_id
 }
+
+output "oidc_provider_arn" {
+  value = module.eks.oidc_provider_arn
+}
+
+output "worker_iam_role_name" {
+  value = module.eks.eks_managed_node_groups["worker_nodes"].iam_role_name
+}

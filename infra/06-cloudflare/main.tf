@@ -65,5 +65,4 @@ resource "kubernetes_secret_v1" "cloudflare_tunnel" {
   data = {
     TUNNEL_TOKEN = data.cloudflare_zero_trust_tunnel_cloudflared_token.eks_tunnel_token.token
   }
-  depends_on = [module.eks]
 }

@@ -45,7 +45,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
   alarm_description   = "This metric monitors EKS node CPU utilization"
 
   dimensions = {
-    ClusterName = module.eks.cluster_name
+    ClusterName = var.cluster_name
   }
   alarm_actions = [aws_sns_topic.eks_alerts.arn]
   ok_actions    = [aws_sns_topic.eks_alerts.arn]

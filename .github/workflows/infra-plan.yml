@@ -6,7 +6,6 @@ on:
       - master
     paths:
       - "infra/**"
-      - ".github/workflows/infra-deploy.yml"
 
 jobs:
   terragrunt-plan:
@@ -35,23 +34,31 @@ jobs:
           scan-type: "config"
           scan-ref: "./infra"
           format: "table"
-          exit-code: "0" # Change to "1" to fail the workflow on critical/high severity issues
+          exit-code: "1"
           severity: "CRITICAL,HIGH"
 
       - name: Hydrate env.yaml
         working-directory: ./infra
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          ALERT_EMAIL: ${{ secrets.YOUR_EMAIL }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
         run: |
           cat <<EOF > env.yaml
-          aws_region: "${{ secrets.AWS_REGION }}"
-          cloudflare_api_token: "${{ secrets.CLOUDFLARE_API_TOKEN }}"
-          github_pat: "${{ secrets.GH_PAT }}"
+          aws_region: "$AWS_REGION"
+          cloudflare_api_token: "$CLOUDFLARE_API_TOKEN"
+          github_pat: "$GH_PAT"
           github_repo_url: "https://github.com/${{ github.repository }}.git"
           # Dummy IP: Since the runner is INSIDE the VPC, it uses internal routing. This just satisfies the Terraform variable requirement.
           local_workstation_cidr: "10.0.0.0/16"
-          alert_email_address: "${{ secrets.YOUR_EMAIL }}"
-          cloudflare_account_id: "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}"
-          cloudflare_zone_id: "${{ secrets.CLOUDFLARE_ZONE_ID }}"
-          domain_name: "${{ secrets.DOMAIN_NAME }}"
+          alert_email_address: "$ALERT_EMAIL"
+          cloudflare_account_id: "$CLOUDFLARE_ACCOUNT_ID"
+          cloudflare_zone_id: "$CLOUDFLARE_ZONE_ID"
+          domain_name: "$DOMAIN_NAME"
           EOF
 
       - name: Terragrunt Run-All Plan

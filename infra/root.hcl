@@ -4,6 +4,21 @@ locals {
   env_vars      = yamldecode(file(local.env_file_path))
 }
 
+remote_state {
+  backend = "s3"
+  generate = {
+    path      = "backend.tf"
+    if_exists = "overwrite_terragrunt"
+  }
+  config = {
+    bucket       = "aether-terragrunt-state-508"
+    key          = "${path_relative_to_include()}/terraform.tfstate"
+    region       = local.env_vars.aws_region
+    encrypt      = true
+    use_lockfile = true
+  }
+}
+
 generate "providers" {
   path      = "providers.tf"
   if_exists = "overwrite_terragrunt"

@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -21,9 +21,10 @@ jobs:
         uses: hashicorp/setup-terraform@v4
 
       - name: Setup Terragrunt
-        uses: autero1/action-terragrunt@v3
+        uses: gruntwork-io/terragrunt-action@v3
         with:
-          terragrunt-version: 1.0.4
+          tg_version: "1.0.4"
+          tf_path: "terraform"
 
       - name: Run Trivy Scanner (IaC)
         uses: aquasecurity/trivy-action@v0.36.0
@@ -52,7 +53,7 @@ jobs:
           github_pat: "$GH_PAT"
           github_repo_url: "https://github.com/${{ github.repository }}.git"
           # Dummy IP: Since the runner is INSIDE the VPC, it uses internal routing. This just satisfies the Terraform variable requirement.
-          local_workstation_cidr: "10.0.0.0/16"
+          local_workstation_cidr: "203.0.113.0/24"
           alert_email_address: "$ALERT_EMAIL"
           cloudflare_account_id: "$CLOUDFLARE_ACCOUNT_ID"
           cloudflare_zone_id: "$CLOUDFLARE_ZONE_ID"

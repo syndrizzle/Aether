@@ -6,7 +6,8 @@ on:
       - master
     paths:
       - "infra/**"
-
+      - ".github/workflows/infra-plan.yml"
+      - ".github/workflows/infra-apply.yml"
 jobs:
   terragrunt-plan:
     runs-on: codebuild-eks-deploy-runner-${{ github.run_id }}-${{ github.run_attempt }}
@@ -27,6 +28,8 @@ jobs:
 
       - name: Setup Terragrunt
         uses: autero1/action-terragrunt@v3
+        with:
+          terragrunt-version: 1.0.4
 
       - name: Run Trivy Scanner (IaC)
         uses: aquasecurity/trivy-action@v0.36.0

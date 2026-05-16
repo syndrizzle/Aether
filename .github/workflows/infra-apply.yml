@@ -1,18 +1,11 @@
-name: Terragrunt CI/CD & Security
+name: Terragrunt Apply (Manual Trigger)
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - "infra/**"
-      - ".github/workflows/infra-deploy.yml"
   workflow_dispatch:
 
 jobs:
-  terragrunt-deploy:
+  terragrunt-apply:
     runs-on: codebuild-eks-deploy-runner-${{ github.run_id }}-${{ github.run_attempt }}
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
@@ -31,7 +24,7 @@ jobs:
         uses: autero1/action-terragrunt@v3
 
       - name: Run Trivy Scanner (IaC)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: "config"
           scan-ref: "./infra"
@@ -54,10 +47,6 @@ jobs:
           cloudflare_zone_id: "${{ secrets.CLOUDFLARE_ZONE_ID }}"
           domain_name: "${{ secrets.DOMAIN_NAME }}"
           EOF
-
-      - name: Terragrunt Run-All Plan
-        working-directory: ./infra
-        run: terragrunt run --all --non-interactive plan
 
       - name: Terragrunt Run-All Apply
         working-directory: ./infra

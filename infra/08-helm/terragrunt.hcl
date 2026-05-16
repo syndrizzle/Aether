@@ -10,13 +10,15 @@ dependency "eks" {
     # b64 for "mock"
     cluster_certificate_authority_data = "bW9jaw=="
   }
+  mock_outputs_allowed_terraform_commands = ["validate", "plan"]
 }
 
 dependency "iam" {
-  config_path = "../05-iam"
+  config_path = "../04-iam"
   mock_outputs = {
     cluster_autoscaler_irsa_role_arn = "arn:aws:iam::123456789012:role/mock-role"
   }
+  mock_outputs_allowed_terraform_commands = ["validate", "plan"]
 }
 
 generate "helm_provider" {

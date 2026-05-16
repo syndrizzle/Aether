@@ -10,6 +10,7 @@ dependency "eks" {
     # b64 for "mock"
     cluster_certificate_authority_data = "bW9jaw=="
   }
+  mock_outputs_allowed_terraform_commands = ["validate", "plan"]
 }
 
 generate "k8s_provider" {

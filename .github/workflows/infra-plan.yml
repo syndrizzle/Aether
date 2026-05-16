@@ -1,0 +1,59 @@
+name: Terragrunt Plan & Security
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "infra/**"
+      - ".github/workflows/infra-deploy.yml"
+
+jobs:
+  terragrunt-plan:
+    runs-on: codebuild-eks-deploy-runner-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v3
+
+      - name: Run Trivy Scanner (IaC)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: "config"
+          scan-ref: "./infra"
+          format: "table"
+          exit-code: "0" # Change to "1" to fail the workflow on critical/high severity issues
+          severity: "CRITICAL,HIGH"
+
+      - name: Hydrate env.yaml
+        working-directory: ./infra
+        run: |
+          cat <<EOF > env.yaml
+          aws_region: "${{ secrets.AWS_REGION }}"
+          cloudflare_api_token: "${{ secrets.CLOUDFLARE_API_TOKEN }}"
+          github_pat: "${{ secrets.GH_PAT }}"
+          github_repo_url: "https://github.com/${{ github.repository }}.git"
+          # Dummy IP: Since the runner is INSIDE the VPC, it uses internal routing. This just satisfies the Terraform variable requirement.
+          local_workstation_cidr: "10.0.0.0/16"
+          alert_email_address: "${{ secrets.YOUR_EMAIL }}"
+          cloudflare_account_id: "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}"
+          cloudflare_zone_id: "${{ secrets.CLOUDFLARE_ZONE_ID }}"
+          domain_name: "${{ secrets.DOMAIN_NAME }}"
+          EOF
+
+      - name: Terragrunt Run-All Plan
+        working-directory: ./infra
+        run: terragrunt run --all --non-interactive plan

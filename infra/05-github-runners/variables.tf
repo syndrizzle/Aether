@@ -21,4 +21,5 @@ variable "github_repo_url" {
 variable "github_pat" {
   description = "A GitHub Personal Access Token with repo scope for runner registration"
   type        = string
+  sensitive   = true
 }

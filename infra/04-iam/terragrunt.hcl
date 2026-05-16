@@ -9,6 +9,7 @@ dependency "eks" {
     oidc_provider_arn    = "arn:aws:iam::123456789012:oidc-provider/mock"
     worker_iam_role_name = "mock-role-name"
   }
+  mock_outputs_allowed_terraform_commands = ["validate", "plan"]
 }
 
 inputs = {
